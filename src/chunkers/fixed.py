@@ -19,6 +19,7 @@ class FixedSizeChunker(BaseChunker):
         self,
         chunk_size: int = 1000,
         chunk_overlap: int = 200,
+        min_chunk_size: int = 100,
         length_function: Optional[callable] = None,
     ):
         """
@@ -27,11 +28,13 @@ class FixedSizeChunker(BaseChunker):
         Args:
             chunk_size: Maximum size of each chunk
             chunk_overlap: Number of characters/tokens to overlap between chunks
+            min_chunk_size: Minimum size of each chunk
             length_function: Function to calculate text length (default: len)
         """
         config = ChunkerConfig(
             chunk_size=chunk_size,
             chunk_overlap=chunk_overlap,
+            min_chunk_size=min_chunk_size,
             length_function=length_function,
         )
         super().__init__(config)

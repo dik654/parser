@@ -27,6 +27,7 @@ class SentenceChunker(BaseChunker):
         self,
         chunk_size: int = 1000,
         chunk_overlap: int = 0,
+        min_chunk_size: int = 100,
         min_sentences: int = 1,
         max_sentences: Optional[int] = None,
     ):
@@ -36,12 +37,14 @@ class SentenceChunker(BaseChunker):
         Args:
             chunk_size: Maximum characters per chunk
             chunk_overlap: Number of sentences to overlap
+            min_chunk_size: Minimum size of each chunk
             min_sentences: Minimum sentences per chunk
             max_sentences: Maximum sentences per chunk (None for unlimited)
         """
         config = ChunkerConfig(
             chunk_size=chunk_size,
             chunk_overlap=chunk_overlap,
+            min_chunk_size=min_chunk_size,
         )
         super().__init__(config)
         self.min_sentences = min_sentences
@@ -149,6 +152,7 @@ class ParagraphChunker(BaseChunker):
         self,
         chunk_size: int = 2000,
         chunk_overlap: int = 0,
+        min_chunk_size: int = 100,
         min_paragraphs: int = 1,
     ):
         """
@@ -157,11 +161,13 @@ class ParagraphChunker(BaseChunker):
         Args:
             chunk_size: Maximum characters per chunk
             chunk_overlap: Number of paragraphs to overlap
+            min_chunk_size: Minimum size of each chunk
             min_paragraphs: Minimum paragraphs per chunk
         """
         config = ChunkerConfig(
             chunk_size=chunk_size,
             chunk_overlap=chunk_overlap,
+            min_chunk_size=min_chunk_size,
         )
         super().__init__(config)
         self.min_paragraphs = min_paragraphs

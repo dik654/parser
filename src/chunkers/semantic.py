@@ -39,6 +39,7 @@ class SemanticChunker(BaseChunker):
         """
         config = ChunkerConfig(
             chunk_size=max_chunk_size,
+            chunk_overlap=0,
             min_chunk_size=min_chunk_size,
         )
         super().__init__(config)
@@ -199,6 +200,7 @@ class SlidingWindowChunker(BaseChunker):
         self,
         window_size: int = 1000,
         step_size: int = 500,
+        min_chunk_size: int = 1,
     ):
         """
         Initialize sliding window chunker.
@@ -206,11 +208,13 @@ class SlidingWindowChunker(BaseChunker):
         Args:
             window_size: Size of each window/chunk
             step_size: How much to move the window each step
+            min_chunk_size: Minimum size of each chunk
         """
         overlap = window_size - step_size
         config = ChunkerConfig(
             chunk_size=window_size,
             chunk_overlap=overlap,
+            min_chunk_size=min_chunk_size,
         )
         super().__init__(config)
         self.step_size = step_size
