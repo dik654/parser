@@ -2,10 +2,13 @@
 Document data models for AI Document Preprocessing Parser.
 """
 
-from dataclasses import dataclass, field
+import json
+import pickle
+from dataclasses import asdict, dataclass, field
 from datetime import datetime
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Union
 
 
 class DocumentType(Enum):
@@ -162,3 +165,85 @@ class Document:
         if include_raw and self.raw_content:
             result["raw_content"] = self.raw_content.hex()
         return result
+
+    def to_json(self, include_raw: bool = False, indent: int = 2) -> str:
+        """Serialize document to JSON string."""
+        return json.dumps(self.to_dict(include_raw=include_raw), indent=indent)
+
+    def save_json(
+        self, path: Union[str, Path], include_raw: bool = False, indent: int = 2
+    ) -> None:
+        """Save document to JSON file."""
+        path = Path(path)
+        path.write_text(self.to_json(include_raw=include_raw, indent=indent))
+
+    def save_pickle(self, path: Union[str, Path]) -> None:
+        """Save document to pickle file."""
+        path = Path(path)
+        with path.open("wb") as f:
+            pickle.dump(self, f)
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> "Document":
+        """Create Document from dictionary."""
+        # Parse metadata
+        metadata_data = data.get("metadata", {})
+        if metadata_data.get("created_at"):
+            metadata_data["created_at"] = datetime.fromisoformat(
+                metadata_data["created_at"]
+            )
+        if metadata_data.get("modified_at"):
+            metadata_data["modified_at"] = datetime.fromisoformat(
+                metadata_data["modified_at"]
+            )
+        metadata = DocumentMetadata(**metadata_data)
+
+        # Parse chunks
+        chunks = []
+        for chunk_data in data.get("chunks", []):
+            chunks.append(
+                TextChunk(
+                    content=chunk_data["content"],
+                    index=chunk_data["index"],
+                    start_char=chunk_data["start_char"],
+                    end_char=chunk_data["end_char"],
+                    metadata=chunk_data.get("metadata", {}),
+                    page_number=chunk_data.get("page_number"),
+                    section=chunk_data.get("section"),
+                )
+            )
+
+        # Parse raw content
+        raw_content = None
+        if data.get("raw_content"):
+            raw_content = bytes.fromhex(data["raw_content"])
+
+        return cls(
+            id=data["id"],
+            content=data["content"],
+            doc_type=DocumentType(data["doc_type"]),
+            metadata=metadata,
+            chunks=chunks,
+            raw_content=raw_content,
+            tables=data.get("tables", []),
+            images=data.get("images", []),
+        )
+
+    @classmethod
+    def from_json(cls, json_str: str) -> "Document":
+        """Create Document from JSON string."""
+        data = json.loads(json_str)
+        return cls.from_dict(data)
+
+    @classmethod
+    def load_json(cls, path: Union[str, Path]) -> "Document":
+        """Load Document from JSON file."""
+        path = Path(path)
+        return cls.from_json(path.read_text())
+
+    @classmethod
+    def load_pickle(cls, path: Union[str, Path]) -> "Document":
+        """Load Document from pickle file."""
+        path = Path(path)
+        with path.open("rb") as f:
+            return pickle.load(f)
