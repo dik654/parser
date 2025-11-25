@@ -1,0 +1,145 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ai-document-parser"
+version = "0.1.0"
+description = "AI Document Preprocessing Parser - Parse and preprocess documents for AI/LLM applications"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.9"
+authors = [
+    {name = "AI Document Parser Team"}
+]
+keywords = [
+    "document-parser",
+    "pdf",
+    "ocr",
+    "nlp",
+    "text-extraction",
+    "rag",
+    "llm",
+    "preprocessing",
+    "chunking"
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Text Processing",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+
+dependencies = [
+    "pypdf>=4.0.0",
+    "pymupdf>=1.23.0",
+    "pdfplumber>=0.10.0",
+    "python-docx>=1.0.0",
+    "python-pptx>=0.6.21",
+    "beautifulsoup4>=4.12.0",
+    "lxml>=4.9.0",
+    "markdown-it-py>=3.0.0",
+    "pytesseract>=0.3.10",
+    "Pillow>=10.0.0",
+    "nltk>=3.8.0",
+    "tiktoken>=0.5.0",
+    "langchain-text-splitters>=0.0.1",
+    "chardet>=5.2.0",
+    "pyyaml>=6.0.0",
+    "pydantic>=2.0.0",
+    "tqdm>=4.66.0",
+    "typing-extensions>=4.9.0",
+]
+
+[project.optional-dependencies]
+ocr = [
+    "easyocr>=1.7.0",
+    "paddleocr>=2.7.0",
+]
+nlp = [
+    "spacy>=3.7.0",
+    "gensim>=4.3.0",
+]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+    "pytest-asyncio>=0.21.0",
+    "black>=23.0.0",
+    "isort>=5.12.0",
+    "flake8>=6.1.0",
+    "mypy>=1.5.0",
+    "pre-commit>=3.4.0",
+]
+docs = [
+    "mkdocs>=1.5.0",
+    "mkdocs-material>=9.4.0",
+    "mkdocstrings[python]>=0.23.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/dik654/parser"
+Documentation = "https://github.com/dik654/parser#readme"
+Repository = "https://github.com/dik654/parser"
+Issues = "https://github.com/dik654/parser/issues"
+
+[project.scripts]
+docparser = "src.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src*"]
+
+[tool.black]
+line-length = 88
+target-version = ["py39", "py310", "py311", "py312"]
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.git
+    | \.hg
+    | \.mypy_cache
+    | \.tox
+    | \.venv
+    | _build
+    | buck-out
+    | build
+    | dist
+)/
+'''
+
+[tool.isort]
+profile = "black"
+line_length = 88
+skip_gitignore = true
+
+[tool.mypy]
+python_version = "3.9"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_functions = ["test_*"]
+addopts = "-v --cov=src --cov-report=term-missing"
+
+[tool.coverage.run]
+source = ["src"]
+omit = ["tests/*"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+]

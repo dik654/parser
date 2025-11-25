@@ -1,0 +1,117 @@
+# AI Document Preprocessing Parser - Default Configuration
+
+# Parser settings
+parser:
+  # PDF parser configuration
+  pdf:
+    engine: "pymupdf"          # Options: pymupdf, pdfplumber
+    ocr_enabled: true          # Enable OCR for scanned PDFs
+    ocr_engine: "tesseract"    # Options: tesseract, easyocr
+    ocr_languages:
+      - "eng"
+      - "kor"
+    extract_tables: true
+    extract_images: false
+    preserve_layout: false
+
+  # DOCX parser configuration
+  docx:
+    preserve_formatting: false
+    extract_tables: true
+    extract_images: false
+    include_headers_footers: true
+
+  # HTML parser configuration
+  html:
+    remove_scripts: true
+    remove_styles: true
+    preserve_links: false
+    preserve_structure: false   # Keep heading hierarchy
+
+  # Markdown parser configuration
+  markdown:
+    remove_code_blocks: false
+    preserve_structure: true
+
+  # Image parser (OCR) configuration
+  image:
+    ocr_engine: "tesseract"
+    languages:
+      - "eng"
+      - "kor"
+    preprocessing:
+      denoise: true
+      deskew: true
+      binarize: false
+
+# Preprocessing settings
+preprocessing:
+  # Text cleaning options
+  cleaning:
+    remove_html_tags: true
+    remove_urls: true
+    remove_emails: true
+    remove_phone_numbers: false
+    remove_special_chars: false
+    normalize_whitespace: true
+    remove_extra_newlines: true
+    strip_text: true
+
+  # Normalization options
+  normalization:
+    unicode_normalize: "NFKC"   # Options: NFC, NFKC, NFD, NFKD, null
+    lowercase: false
+    remove_accents: false
+
+  # Advanced NLP processing (optional)
+  advanced:
+    remove_stopwords: false
+    stopword_language: "english"
+    stemming: false
+    stemmer: "porter"          # Options: porter, snowball
+    lemmatization: false
+
+# Chunking settings
+chunking:
+  strategy: "recursive"        # Options: fixed_size, recursive, semantic, sentence, paragraph
+  chunk_size: 512              # Target chunk size in tokens
+  chunk_overlap: 50            # Overlap between chunks
+  min_chunk_size: 100          # Minimum chunk size
+  max_chunk_size: 1000         # Maximum chunk size
+  separators:
+    - "\n\n"
+    - "\n"
+    - ". "
+    - ", "
+    - " "
+
+  # Token counter configuration
+  tokenizer: "tiktoken"        # Options: tiktoken, huggingface
+  tokenizer_model: "cl100k_base"  # For tiktoken (GPT-4)
+
+  # Semantic chunking options (when strategy is "semantic")
+  semantic:
+    embedding_model: null
+    similarity_threshold: 0.5
+    min_sentences: 2
+
+# Pipeline settings
+pipeline:
+  on_error: "skip"             # Options: skip, raise, log
+  max_retries: 3
+  fallback_parser: true
+  show_progress: true
+  parallel_workers: 4
+
+# Output settings
+output:
+  format: "json"               # Options: json, jsonl, pickle
+  include_metadata: true
+  include_raw_content: false
+  include_chunks: true
+  output_encoding: "utf-8"
+
+# Logging settings
+logging:
+  level: "INFO"                # Options: DEBUG, INFO, WARNING, ERROR
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
