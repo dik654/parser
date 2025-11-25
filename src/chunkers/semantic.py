@@ -2,12 +2,13 @@
 Semantic text chunker using embeddings.
 """
 
-from typing import Any, Callable, List, Optional
-
-import numpy as np
+from typing import Any, Callable, List, Optional, TYPE_CHECKING
 
 from src.chunkers.base import BaseChunker, ChunkerConfig
 from src.document import TextChunk
+
+if TYPE_CHECKING:
+    import numpy as np
 
 
 class SemanticChunker(BaseChunker):
@@ -98,6 +99,14 @@ class SemanticChunker(BaseChunker):
         embeddings: List[List[float]],
     ) -> List[int]:
         """Find breakpoints using embedding similarity."""
+        try:
+            import numpy as np
+        except ImportError:
+            raise ImportError(
+                "numpy is required for semantic chunking. "
+                "Install with: pip install numpy"
+            )
+
         breakpoints = []
         embeddings_array = np.array(embeddings)
 
@@ -131,8 +140,10 @@ class SemanticChunker(BaseChunker):
 
         return breakpoints
 
-    def _cosine_similarity(self, vec1: np.ndarray, vec2: np.ndarray) -> float:
+    def _cosine_similarity(self, vec1: Any, vec2: Any) -> float:
         """Calculate cosine similarity between two vectors."""
+        import numpy as np
+
         norm1 = np.linalg.norm(vec1)
         norm2 = np.linalg.norm(vec2)
         if norm1 == 0 or norm2 == 0:

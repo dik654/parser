@@ -7,9 +7,8 @@ Parse and preprocess documents for AI/LLM applications.
 __version__ = "0.1.0"
 __author__ = "AI Document Parser Team"
 
+# Core imports (always available)
 from src.document import Document, DocumentMetadata, DocumentType, TextChunk
-from src.parsers import ParserRegistry
-from src.pipeline import Pipeline, PipelineConfig, BatchProcessor
 
 __all__ = [
     # Core
@@ -17,12 +16,19 @@ __all__ = [
     "DocumentMetadata",
     "DocumentType",
     "TextChunk",
-    # Pipeline
-    "Pipeline",
-    "PipelineConfig",
-    "BatchProcessor",
-    # Registry
-    "ParserRegistry",
     # Version
     "__version__",
 ]
+
+# Optional imports - available when dependencies are installed
+try:
+    from src.parsers import ParserRegistry
+    __all__.append("ParserRegistry")
+except ImportError:
+    pass
+
+try:
+    from src.pipeline import Pipeline, PipelineConfig, BatchProcessor
+    __all__.extend(["Pipeline", "PipelineConfig", "BatchProcessor"])
+except ImportError:
+    pass
