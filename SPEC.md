@@ -706,16 +706,163 @@ response = OpenAI().chat.completions.create(
 
 ---
 
-## 11. Testing Strategy
+## 11. Evaluation & Benchmarking
 
-### 11.1 Test Categories
+설정별 결과물과 임베딩 품질을 비교하기 위한 평가 시스템을 제공합니다.
+
+### 11.1 평가 모듈 구조
+
+```
+src/evaluation/
+├── __init__.py
+├── metrics.py           # 평가 메트릭 정의
+├── comparator.py        # 설정 비교기
+├── embedding_evaluator.py  # 임베딩 품질 평가
+└── benchmark.py         # 벤치마크 러너
+```
+
+### 11.2 텍스트 추출 메트릭
+
+```python
+@dataclass
+class TextExtractionMetrics:
+    # 기본 메트릭
+    char_count: int
+    word_count: int
+    line_count: int
+
+    # 품질 메트릭 (Ground Truth 대비)
+    precision: float      # 추출 정확도
+    recall: float         # 추출 완전성
+    f1_score: float       # F1 점수
+    bleu_score: float     # BLEU 점수
+    error_rate: float     # Word Error Rate
+
+    # 유사도 메트릭
+    char_similarity: float
+    word_similarity: float
+```
+
+### 11.3 청킹 메트릭
+
+```python
+@dataclass
+class ChunkingMetrics:
+    total_chunks: int
+    avg_chunk_size: float
+    std_chunk_size: float
+    sentence_boundary_ratio: float  # 문장 경계 비율
+    coverage: float                  # 원본 대비 커버리지
+```
+
+### 11.4 임베딩 평가 메트릭
+
+```python
+@dataclass
+class EmbeddingMetrics:
+    # 검색 품질
+    recall_at_k: Dict[int, float]   # R@1, R@5, R@10
+    precision_at_k: Dict[int, float]
+    mrr: float                       # Mean Reciprocal Rank
+    ndcg: float                      # Normalized DCG
+
+    # 유사도 분포
+    avg_intra_similarity: float      # 문서 내 유사도
+    avg_inter_similarity: float      # 문서 간 유사도
+```
+
+### 11.5 설정 비교 사용법
+
+```python
+from src.evaluation import ConfigComparator, ParsingResult
+
+# 비교기 생성
+comparator = ConfigComparator(ground_truth="expected text...")
+
+# 파싱 결과 추가
+result_a = ParsingResult(
+    config_name="config_a",
+    config={"engine": "pymupdf"},
+    document_path="doc.pdf",
+    content="extracted text...",
+    chunks=["chunk1", "chunk2"],
+)
+comparator.add_result(result_a)
+comparator.add_result(result_b)
+
+# 비교 리포트 생성
+report = comparator.generate_report()
+print(report.rankings)          # 설정별 순위
+print(report.recommendations)   # 권장 설정
+report.save("comparison_report.json")
+```
+
+### 11.6 임베딩 비교 사용법
+
+```python
+from src.evaluation import EmbeddingEvaluator
+
+evaluator = EmbeddingEvaluator()
+
+# 설정별 임베딩 추가
+evaluator.add_embeddings("config_a", chunks_a, vectors_a, "text-embedding-3-small")
+evaluator.add_embeddings("config_b", chunks_b, vectors_b, "text-embedding-3-small")
+
+# 검색 품질 평가
+queries = [("What is AI?", ["relevant_chunk_1", "relevant_chunk_2"])]
+eval_result = evaluator.evaluate_retrieval("config_a", queries, embed_fn)
+print(f"Recall@5: {eval_result.recall_at_5}")
+print(f"MRR: {eval_result.mrr}")
+
+# 설정 간 임베딩 비교
+comparison = evaluator.compare_embeddings("config_a", "config_b")
+print(f"Cosine Similarity: {comparison.avg_cosine_similarity}")
+```
+
+### 11.7 벤치마크 실행
+
+```python
+from src.evaluation import BenchmarkRunner, BenchmarkConfig
+
+# 설정 정의
+configs = [
+    BenchmarkConfig(
+        name="fast",
+        parser_config={"pdf": {"engine": "pymupdf"}},
+        chunker_config={"strategy": "fixed_size", "chunk_size": 512},
+    ),
+    BenchmarkConfig(
+        name="quality",
+        parser_config={"pdf": {"engine": "pdfplumber", "ocr_enabled": True}},
+        chunker_config={"strategy": "recursive", "chunk_size": 400},
+    ),
+]
+
+# 벤치마크 실행
+runner = BenchmarkRunner(parse_fn=my_parser, chunk_fn=my_chunker)
+suite = runner.run(
+    configs=configs,
+    documents=["doc1.pdf", "doc2.pdf"],
+    ground_truth={"doc1.pdf": "expected text..."},
+)
+
+# 결과 저장
+suite.save("benchmark_results.json")
+print(suite.rankings)  # {'quality': 1, 'fast': 2}
+```
+
+---
+
+## 12. Testing Strategy
+
+### 12.1 Test Categories
 
 1. **Unit Tests**: 개별 컴포넌트 테스트
 2. **Integration Tests**: 파이프라인 통합 테스트
 3. **Performance Tests**: 벤치마크 및 부하 테스트
 4. **Edge Case Tests**: 특수 케이스 (빈 파일, 손상된 파일 등)
 
-### 11.2 Test Fixtures
+### 12.2 Test Fixtures
 
 - 다양한 형식의 샘플 문서
 - 여러 언어 문서 (영어, 한국어, 일본어 등)

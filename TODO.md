@@ -248,9 +248,55 @@
 
 ---
 
-## Phase 7: Documentation & Examples
+## Phase 7: Evaluation & Benchmarking
 
-### 7.1 Documentation
+### 7.1 평가 메트릭 구현 ✅
+- [x] TextExtractionMetrics 구현 (precision, recall, F1, BLEU)
+- [x] ChunkingMetrics 구현 (크기 분포, 경계 분석)
+- [x] EmbeddingMetrics 구현 (검색 품질, 유사도)
+- [x] calculate_text_similarity 구현 (sequence, jaccard, cosine)
+- [x] calculate_bleu_score 구현
+- [x] calculate_word_error_rate 구현
+- [x] Unit tests 작성
+
+### 7.2 설정 비교기 구현 ✅
+- [x] ParsingResult 데이터 클래스
+- [x] ConfigComparator 클래스
+- [x] ComparisonReport 생성
+- [x] 설정별 순위 계산
+- [x] 권장 설정 생성
+- [x] JSON 리포트 저장
+- [x] Unit tests 작성
+
+### 7.3 임베딩 평가 모듈 ✅
+- [x] EmbeddingEvaluator 클래스
+- [x] 코사인 유사도 계산
+- [x] 검색 결과 비교 (find_similar)
+- [x] Recall@K, Precision@K 계산
+- [x] MRR, NDCG 계산
+- [x] 설정 간 임베딩 비교
+- [x] Unit tests 작성
+
+### 7.4 벤치마크 러너 ✅
+- [x] BenchmarkConfig 데이터 클래스
+- [x] BenchmarkResult 데이터 클래스
+- [x] BenchmarkRunner 클래스
+- [x] BenchmarkSuite 생성
+- [x] 기본 설정 템플릿 (create_default_configs)
+- [x] 진행 콜백 지원
+- [x] Unit tests 작성
+
+### 7.5 추가 개선 (Optional)
+- [ ] 시각화 리포트 생성 (HTML/Matplotlib)
+- [ ] 통계적 유의성 테스트
+- [ ] 자동 최적 설정 탐색
+- [ ] CI/CD 벤치마크 통합
+
+---
+
+## Phase 8: Documentation & Examples
+
+### 8.1 Documentation
 - [ ] API 문서 (Sphinx/MkDocs)
 - [ ] 설치 가이드
 - [ ] 빠른 시작 가이드
@@ -258,26 +304,27 @@
 - [ ] 트러블슈팅 가이드
 - [ ] 기여 가이드 (CONTRIBUTING.md)
 
-### 7.2 Examples
+### 8.2 Examples
 - [ ] 기본 사용법 예제
 - [ ] 배치 처리 예제
 - [ ] 커스텀 파서 작성 예제
 - [ ] LangChain 통합 예제
 - [ ] RAG 파이프라인 예제
 - [ ] 설정 파일 예제
+- [x] 벤치마크 예제 (benchmark_example.py)
 
 ---
 
-## Phase 8: Testing & Quality
+## Phase 9: Testing & Quality
 
-### 8.1 Testing
+### 9.1 Testing
 - [ ] 단위 테스트 (coverage > 80%)
 - [ ] 통합 테스트
 - [ ] 성능 벤치마크 테스트
 - [ ] 다양한 샘플 문서 수집 (fixtures)
 - [ ] 엣지 케이스 테스트 (빈 파일, 손상된 파일 등)
 
-### 8.2 Quality Assurance
+### 9.2 Quality Assurance
 - [ ] Type hints 완전 적용
 - [ ] mypy 통과
 - [ ] 코드 스타일 일관성 (black, isort)
@@ -286,27 +333,27 @@
 
 ---
 
-## Phase 9: Advanced Features (Future)
+## Phase 10: Advanced Features (Future)
 
-### 9.1 Performance Optimization
+### 10.1 Performance Optimization
 - [ ] 캐싱 레이어 추가
 - [ ] 스트리밍 처리 지원
 - [ ] 메모리 최적화 (대용량 파일)
 - [ ] 프로파일링 및 병목 해결
 
-### 9.2 Advanced OCR
+### 10.2 Advanced OCR
 - [ ] PaddleOCR 통합
 - [ ] 레이아웃 분석
 - [ ] 표 인식 개선
 - [ ] 수식 인식
 
-### 9.3 LLM Integration
+### 10.3 LLM Integration
 - [ ] LLM 기반 청킹
 - [ ] 문서 구조 분석 (LLM)
 - [ ] 자동 메타데이터 생성
 - [ ] 의미 기반 섹션 분할
 
-### 9.4 API Server (Optional)
+### 10.4 API Server (Optional)
 - [ ] FastAPI 기반 REST API
 - [ ] 비동기 작업 큐
 - [ ] 인증/권한 관리
