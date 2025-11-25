@@ -9,6 +9,10 @@ pdfplumber>=0.10.0
 python-docx>=1.0.0
 python-pptx>=0.6.21
 openpyxl>=3.1.0
+pandas>=2.0.0
+
+# 한글 문서 (HWP/HWPX)
+olefile>=0.46
 
 # HTML/XML Processing
 beautifulsoup4>=4.12.0

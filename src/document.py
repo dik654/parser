@@ -15,6 +15,8 @@ class DocumentType(Enum):
     DOCX = "docx"
     PPTX = "pptx"
     XLSX = "xlsx"
+    HWP = "hwp"
+    HWPX = "hwpx"
     HTML = "html"
     MARKDOWN = "markdown"
     IMAGE = "image"
@@ -33,6 +35,8 @@ class DocumentType(Enum):
             "ppt": cls.PPTX,
             "xlsx": cls.XLSX,
             "xls": cls.XLSX,
+            "hwp": cls.HWP,
+            "hwpx": cls.HWPX,
             "html": cls.HTML,
             "htm": cls.HTML,
             "md": cls.MARKDOWN,
@@ -43,7 +47,10 @@ class DocumentType(Enum):
             "gif": cls.IMAGE,
             "bmp": cls.IMAGE,
             "tiff": cls.IMAGE,
+            "tif": cls.IMAGE,
+            "webp": cls.IMAGE,
             "txt": cls.TEXT,
+            "csv": cls.TEXT,
         }
         return mapping.get(ext, cls.UNKNOWN)
 

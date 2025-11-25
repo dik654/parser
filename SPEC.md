@@ -6,12 +6,14 @@
 AI Document Preprocessing Parser는 다양한 형식의 문서(PDF, DOCX, HTML, 이미지 등)를 AI/LLM 학습 및 RAG(Retrieval-Augmented Generation) 시스템에 적합한 형태로 변환하는 Python 라이브러리입니다.
 
 ### 1.2 Goals
-- 다양한 문서 형식 지원 (PDF, DOCX, PPTX, HTML, Markdown, 이미지)
+- 다양한 문서 형식 지원 (PDF, DOCX, PPTX, XLSX, HWPX/HWP, HTML, Markdown, 이미지)
 - 고품질 텍스트 추출 및 구조 보존
 - OCR 지원으로 스캔 문서 처리
+- **임베디드 이미지 OCR 처리** (문서 내 포함된 이미지에서 텍스트 추출)
 - RAG 시스템을 위한 최적화된 청킹(Chunking)
 - 메타데이터 추출 및 관리
 - 확장 가능한 파이프라인 아키텍처
+- 한글 문서(HWP/HWPX) 네이티브 지원
 
 ### 1.3 Non-Goals
 - 문서 생성/편집 기능
@@ -54,7 +56,9 @@ parser/
 │   │   ├── html_parser.py       # HTML 파서
 │   │   ├── markdown_parser.py   # Markdown 파서
 │   │   ├── image_parser.py      # 이미지 OCR 파서
-│   │   └── pptx_parser.py       # PowerPoint 파서
+│   │   ├── pptx_parser.py       # PowerPoint 파서
+│   │   ├── xlsx_parser.py       # Excel 파서
+│   │   └── hwp_parser.py        # 한글(HWP/HWPX) 파서
 │   │
 │   ├── preprocessors/           # 텍스트 전처리기
 │   │   ├── __init__.py
@@ -114,6 +118,9 @@ class DocumentType(Enum):
     PDF = "pdf"
     DOCX = "docx"
     PPTX = "pptx"
+    XLSX = "xlsx"
+    HWP = "hwp"
+    HWPX = "hwpx"
     HTML = "html"
     MARKDOWN = "markdown"
     IMAGE = "image"
@@ -301,6 +308,59 @@ class ChunkerConfig:
   - 슬라이드별 텍스트 추출
   - 노트 추출
   - 이미지/도형 텍스트
+  - **임베디드 이미지 OCR** (선택적)
+
+### 4.7 Excel (XLSX/XLS)
+- **라이브러리**: openpyxl (기본), pandas (데이터 처리)
+- **기능**:
+  - 시트별 텍스트 추출
+  - 셀 데이터 → 텍스트 변환
+  - 테이블 구조 보존 옵션
+  - 수식 결과값 추출
+  - 병합 셀 처리
+  - **임베디드 이미지 OCR** (선택적)
+  - 다중 시트 처리
+
+### 4.8 한글 문서 (HWP/HWPX)
+- **라이브러리**:
+  - HWPX: zipfile + xml.etree (표준 라이브러리), BeautifulSoup (파싱 보조)
+  - HWP: olefile, pyhwp, libhwp (Rust 기반)
+- **기능**:
+  - 본문 텍스트 추출
+  - 테이블 추출
+  - 메타데이터 추출 (제목, 저자 등)
+  - 섹션별 처리 (section0.xml, section1.xml 등)
+  - **임베디드 이미지 OCR** (선택적)
+- **참고**:
+  - HWPX는 ZIP 기반 XML 포맷 (KS X 6101 표준)
+  - HWP는 OLE Compound File 구조 (바이너리)
+
+### 4.9 임베디드 이미지 처리 (Embedded Image OCR)
+
+모든 문서 형식에서 포함된 이미지를 추출하고 OCR을 수행할 수 있습니다.
+
+- **지원 문서**: PDF, DOCX, PPTX, XLSX, HWPX
+- **라이브러리**:
+  - 이미지 추출: PyMuPDF (PDF), python-docx (DOCX), python-pptx (PPTX)
+  - OCR: pytesseract, EasyOCR
+- **기능**:
+  - 문서 내 이미지 자동 감지 및 추출
+  - 추출된 이미지에 OCR 적용
+  - OCR 결과를 본문 텍스트에 병합
+  - 이미지 위치 정보 보존 (선택적)
+  - 이미지별 메타데이터 (크기, 형식, 페이지 번호)
+
+```python
+# 임베디드 이미지 OCR 사용 예시
+from parser import parse
+
+doc = parse("document.pdf", extract_embedded_images=True, ocr_images=True)
+
+# 추출된 이미지 정보
+for img in doc.images:
+    print(f"Image: {img['filename']}, Page: {img['page']}")
+    print(f"OCR Text: {img['ocr_text']}")
+```
 
 ---
 
@@ -368,6 +428,32 @@ parser:
   docx:
     preserve_formatting: false
     extract_tables: true
+    extract_images: true
+    ocr_images: true              # 임베디드 이미지 OCR
+
+  pptx:
+    extract_notes: true
+    extract_images: true
+    ocr_images: true
+
+  xlsx:
+    include_all_sheets: true
+    preserve_table_structure: true
+    include_formulas: false       # 수식 대신 결과값 사용
+    extract_images: true
+    ocr_images: true
+
+  hwp:
+    engine: "auto"                # auto | olefile | libhwp
+    extract_tables: true
+    extract_images: true
+    ocr_images: true
+
+  hwpx:
+    extract_tables: true
+    extract_images: true
+    ocr_images: true
+    parse_sections: true          # 여러 섹션 파일 처리
 
   html:
     remove_scripts: true
@@ -557,6 +643,11 @@ for error in results.errors:
 | PDF 텍스트 추출 (10페이지) | < 1초 |
 | PDF OCR (10페이지) | < 30초 |
 | DOCX 파싱 | < 0.5초 |
+| PPTX 파싱 (20슬라이드) | < 1초 |
+| XLSX 파싱 (1,000행) | < 0.5초 |
+| HWPX 파싱 | < 0.5초 |
+| HWP 파싱 | < 1초 |
+| 임베디드 이미지 OCR (이미지당) | < 3초 |
 | 청킹 (10,000 토큰) | < 0.1초 |
 
 ---

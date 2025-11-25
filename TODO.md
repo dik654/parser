@@ -85,6 +85,50 @@
 - [ ] 슬라이드별 텍스트 추출
 - [ ] 발표자 노트 추출
 - [ ] 도형 내 텍스트 추출
+- [ ] 임베디드 이미지 추출 및 OCR
+- [ ] Unit tests 작성
+
+### 2.7 XLSX Parser
+- [ ] openpyxl 기반 구현
+- [ ] pandas 통합 (데이터 처리용)
+- [ ] 다중 시트 처리
+- [ ] 셀 데이터 → 텍스트 변환
+- [ ] 테이블 구조 보존 옵션
+- [ ] 수식 결과값 추출
+- [ ] 병합 셀 처리
+- [ ] 임베디드 이미지 추출 및 OCR
+- [ ] Unit tests 작성
+
+### 2.8 HWP Parser (한글 - 바이너리)
+- [ ] olefile 기반 구현
+- [ ] libhwp (Rust) 통합 (대체 엔진)
+- [ ] 본문 텍스트 추출
+- [ ] 테이블 추출
+- [ ] 메타데이터 추출
+- [ ] 임베디드 이미지 추출 및 OCR
+- [ ] Unit tests 작성
+
+### 2.9 HWPX Parser (한글 - XML)
+- [ ] zipfile + xml.etree 기반 구현
+- [ ] BeautifulSoup 파싱 보조
+- [ ] section*.xml 파일 처리
+- [ ] Contents/content.hpf 분석
+- [ ] 본문 텍스트 추출 (hp:t 태그)
+- [ ] 테이블 추출 (hp:tbl 태그)
+- [ ] 메타데이터 추출
+- [ ] 임베디드 이미지 추출 및 OCR
+- [ ] Unit tests 작성
+
+### 2.10 Embedded Image OCR (공통 모듈)
+- [ ] 이미지 추출 인터페이스 정의
+- [ ] PDF 임베디드 이미지 추출 (PyMuPDF)
+- [ ] DOCX 임베디드 이미지 추출 (python-docx)
+- [ ] PPTX 임베디드 이미지 추출 (python-pptx)
+- [ ] XLSX 임베디드 이미지 추출 (openpyxl)
+- [ ] HWPX 임베디드 이미지 추출 (BinData 폴더)
+- [ ] OCR 엔진 통합 (pytesseract/EasyOCR)
+- [ ] 이미지 전처리 파이프라인
+- [ ] OCR 결과 텍스트 병합 옵션
 - [ ] Unit tests 작성
 
 ---
@@ -287,8 +331,9 @@
 **목표:** 모든 주요 기능 구현 및 안정화
 
 - [ ] Phase 1-6 완료
-- [ ] 모든 파서 구현
+- [ ] 모든 파서 구현 (PDF, DOCX, HTML, PPTX, XLSX, HWP, HWPX)
 - [ ] OCR 완전 지원
+- [ ] 임베디드 이미지 OCR 지원
 - [ ] 모든 청킹 전략
 - [ ] 문서화 완료
 - [ ] 테스트 커버리지 80%+
@@ -306,15 +351,18 @@
 ## Notes
 
 ### Dependencies Priority
-1. **필수:** pypdf, pymupdf, python-docx, beautifulsoup4, pytesseract
-2. **권장:** pdfplumber, spacy, tiktoken, langchain-text-splitters
-3. **선택:** easyocr, paddleocr, openai, anthropic
+1. **필수:** pypdf, pymupdf, python-docx, python-pptx, openpyxl, beautifulsoup4, pytesseract
+2. **권장:** pdfplumber, pandas, spacy, tiktoken, langchain-text-splitters, olefile
+3. **선택:** easyocr, paddleocr, libhwp, openai, anthropic
 
 ### Known Challenges
 1. OCR 정확도 (스캔 품질에 의존)
 2. 복잡한 PDF 레이아웃 (다단, 표)
 3. 다국어 문서 처리
 4. 대용량 파일 메모리 관리
+5. HWP 바이너리 포맷 파싱 (복잡한 OLE 구조)
+6. HWPX 네임스페이스 버전 호환성
+7. 임베디드 이미지 OCR 성능 최적화
 
 ### References
 - [REFERENCES.md](docs/references/REFERENCES.md) 참조

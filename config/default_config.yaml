@@ -18,8 +18,40 @@ parser:
   docx:
     preserve_formatting: false
     extract_tables: true
-    extract_images: false
+    extract_images: true
+    ocr_images: true               # OCR on embedded images
     include_headers_footers: true
+
+  # PPTX parser configuration
+  pptx:
+    extract_notes: true            # Include speaker notes
+    extract_images: true
+    ocr_images: true
+    include_slide_numbers: true
+
+  # XLSX parser configuration
+  xlsx:
+    include_all_sheets: true       # Process all sheets
+    preserve_table_structure: true
+    include_formulas: false        # Use formula results instead
+    handle_merged_cells: true
+    extract_images: true
+    ocr_images: true
+    empty_cell_value: ""           # Value for empty cells
+
+  # HWP parser configuration (바이너리 한글 문서)
+  hwp:
+    engine: "auto"                 # Options: auto, olefile, libhwp
+    extract_tables: true
+    extract_images: true
+    ocr_images: true
+
+  # HWPX parser configuration (XML 한글 문서)
+  hwpx:
+    extract_tables: true
+    extract_images: true
+    ocr_images: true
+    parse_all_sections: true       # Process section0.xml, section1.xml, etc.
 
   # HTML parser configuration
   html:
@@ -43,6 +75,22 @@ parser:
       denoise: true
       deskew: true
       binarize: false
+
+  # Embedded image OCR settings (applies to all document types)
+  embedded_images:
+    enabled: true                  # Extract and OCR embedded images
+    ocr_engine: "tesseract"        # Options: tesseract, easyocr
+    languages:
+      - "eng"
+      - "kor"
+    min_image_size: 50             # Minimum image dimension (pixels)
+    max_image_size: 4096           # Maximum image dimension (pixels)
+    merge_ocr_text: true           # Merge OCR text into document content
+    preserve_image_metadata: true  # Keep image position/size info
+    preprocessing:
+      denoise: true
+      deskew: true
+      enhance_contrast: false
 
 # Preprocessing settings
 preprocessing:
